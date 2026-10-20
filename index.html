@@ -98,7 +98,7 @@
       z-index: 9; pointer-events: none;
       display: inline-flex; align-items: center; gap: 8px;
       padding: 8px 20px; border-radius: 30px;
-      background: rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(220, 185, 200, 0.7);
       box-shadow: 0 4px 20px rgba(112, 58, 80, 0.12);
       backdrop-filter: blur(6px);
@@ -160,7 +160,9 @@
       background: rgba(187, 223, 245, 0.45);
       backdrop-filter: blur(8px);
     }
-    dialog[open] {
+
+    /* Name Prompt Dialog */
+    #nameDialog[open] {
       animation: modalUnfold .6s cubic-bezier(.16, 1, .3, 1) both;
     }
     @keyframes modalUnfold {
@@ -168,7 +170,6 @@
       to { opacity: 1; transform: none; }
     }
 
-    /* Name Prompt Dialog */
     .name-dialog-content {
       padding: clamp(28px, 5vw, 42px) clamp(24px, 5vw, 36px);
       text-align: center;
@@ -225,6 +226,22 @@
       opacity: 0.9;
     }
 
+    /* Wish Card Dialog - Gentle Reveal Animation */
+    #wishCard {
+      opacity: 0;
+      transform: translateY(34px) scale(0.96);
+      transition: opacity 0.75s cubic-bezier(.16, 1, .3, 1), transform 0.75s cubic-bezier(.16, 1, .3, 1);
+    }
+    #wishCard.is-open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    #wishCard::backdrop {
+      background: rgba(30, 15, 25, 0.4);
+      backdrop-filter: blur(5px);
+      transition: opacity 0.75s ease;
+    }
+
     /* Wish Card Letter */
     .letter {
       position: relative; padding: 36px 36px 28px; text-align: center;
@@ -266,6 +283,11 @@
     .message {
       font-size: 14.5px; line-height: 1.95; margin: 0 0 14px;
       text-wrap: pretty; color: #582e3f;
+      animation: gentleFadeUp 0.9s cubic-bezier(.16, 1, .3, 1) both;
+    }
+    @keyframes gentleFadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
     }
     .signature {
       margin: 22px 0 24px; font: italic 16.5px/1.8 var(--font-letter);
@@ -362,7 +384,7 @@
     <!-- Floating Tooltip -->
     <div id="flowerTooltip" class="flower-tooltip" hidden>
       <span id="tooltipFlowerName">Đóa hoa hồng</span>
-      <span class="tooltip-sub">Chạm để nhận lời chúc 🌸</span>
+      <span class="tooltip-sub">Chạm để đóa hoa tiến tới trao lời chúc 🌸</span>
     </div>
 
     <!-- Toast Notification -->
@@ -400,7 +422,7 @@
           </button>
         </form>
         <p class="name-tip">
-          💡 Mỗi đóa hoa trong vườn đều ẩn chứa một lời chúc độc nhất dành riêng cho bạn.
+          💡 Chạm vào đóa hoa nào, đóa hoa đó sẽ tiến tới và gửi tặng bạn một lời chúc riêng.
         </p>
       </div>
     </dialog>
@@ -488,6 +510,9 @@
       const TAU = Math.PI * 2;
       const clamp = n => Math.max(0, Math.min(1, n));
       const ease = n => 1 - Math.pow(1 - clamp(n), 3);
+      const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const easeOutCubic = t => 1 - Math.pow(1 - clamp(t), 3);
+
       let seed = 2010;
       const random = () => { seed = seed * 16807 % 2147483647; return (seed - 1) / 2147483646; };
       
@@ -673,9 +698,21 @@
         }
       }
 
+      // Magic sparkles dancing around the advancing flower
+      const magicSparkles = [];
+
+      // ==========================================
+      // Flower Advance & Zoom Interaction States
+      // ==========================================
+      let focusFlower = null;
+      let focusProgress = 0;       // 0 -> 1
+      let focusState = 'idle';     // 'idle' | 'advancing' | 'focused' | 'returning'
+      let focusStartTime = 0;
+      const FOCUS_ADVANCE_DURATION = 1250; // 1.25s smooth advance
+      const FOCUS_RETURN_DURATION = 850;   // 0.85s return
+
       const pointer = { x: -1000, y: -1000 };
       let hoveredFlower = null;
-      let lastHoveredFlower = null;
       let lastPickedFlower = hero;
       let width = 0, height = 0, scale = 1, frame = 0, lastFrame = 0;
       let sceneTime = 0;
@@ -702,7 +739,7 @@
         
         const dx = x - pointer.x, dy = y - pointer.y;
         const distance = Math.hypot(dx, dy);
-        const proximity = !motion.matches && !card.open ? clamp(1 - distance / (r * 2.3)) : 0;
+        const proximity = (!motion.matches && focusState === 'idle' && !card.open) ? clamp(1 - distance / (r * 2.3)) : 0;
         
         f.offsetX += ((dx / (distance || 1)) * proximity * r * .13 - f.offsetX) * smoothing;
         f.offsetY += ((dy / (distance || 1)) * proximity * r * .08 - f.offsetY) * smoothing;
@@ -721,7 +758,12 @@
         f.screenY = headY;
         f.screenRadius = r;
 
-        ctx.save(); ctx.globalAlpha = isHero ? 1 : Math.min(1, f.alpha) * clamp(growth * 3);
+        // Dim if another flower is in focus
+        const dimFactor = (focusProgress > 0 && f !== focusFlower) ? (1 - focusProgress * 0.45) : 1;
+        
+        ctx.save();
+        ctx.globalAlpha = (isHero ? 1 : Math.min(1, f.alpha) * clamp(growth * 3)) * dimFactor;
+        
         const stemColor = ctx.createLinearGradient(baseX - 2, root, headX + 2, headY);
         stemColor.addColorStop(0, '#46664c'); stemColor.addColorStop(.5, '#789265'); stemColor.addColorStop(1, '#587b53');
         ctx.strokeStyle = stemColor;
@@ -742,10 +784,16 @@
           });
         }
 
+        // If this flower is currently advancing in focus, its head is drawn in the focus pass!
+        if (f === focusFlower && focusProgress > 0.05) {
+          ctx.restore();
+          return;
+        }
+
         ctx.translate(headX, headY);
         ctx.rotate(f.rotation + wind * .095 + f.offsetX * .003);
         const breath = motion.matches ? 1 : 1 + Math.sin(time * .0014 + f.phase) * .008;
-        const isHovered = (hoveredFlower === f);
+        const isHovered = (hoveredFlower === f && focusState === 'idle');
         const hoverBonus = isHovered ? .12 : 0;
         
         ctx.scale((breath + hoverBonus) * (1 + f.hover * .04), f.tilt * (breath + hoverBonus) * (1 + f.hover * .04));
@@ -774,7 +822,7 @@
           }
         }
 
-        // Radiant halo ring when hovered
+        // Radiant halo ring when hovered in idle state
         if (isHovered && state === 'ready') {
           ctx.beginPath();
           ctx.arc(0, 0, r * 0.9, 0, TAU);
@@ -789,12 +837,87 @@
         ctx.restore();
       }
 
+      function drawStarSparkle(c, x, y, size, rot) {
+        c.save();
+        c.translate(x, y);
+        c.rotate(rot);
+        c.fillStyle = '#fffdf5';
+        c.shadowColor = '#ffcde0';
+        c.shadowBlur = 8;
+        c.beginPath();
+        for (let i = 0; i < 4; i++) {
+          c.rotate(Math.PI / 2);
+          c.lineTo(size, 0);
+          c.lineTo(size * 0.22, size * 0.22);
+        }
+        c.fill();
+        c.restore();
+      }
+
+      // Draw the focused flower advancing and zooming into close-up
+      function drawFocusedFlower(f, progress, time) {
+        if (!f || progress <= 0) return;
+        const p = clamp(progress);
+        
+        // Target close-up position: center screen, scaled beautifully
+        const isNarrow = width < 650;
+        const targetX = width * 0.5;
+        const targetY = isNarrow ? height * 0.28 : height * 0.35;
+        const targetRadius = Math.min(width * 0.28, height * 0.24, 110);
+
+        const curX = f.startX + (targetX - f.startX) * p;
+        const curY = f.startY + (targetY - f.startY) * p;
+        const curR = f.startRadius + (targetRadius - f.startRadius) * p;
+
+        ctx.save();
+        ctx.translate(curX, curY);
+
+        // Gentle floating roll angle
+        const floatRoll = Math.sin(time * 0.002) * 0.06;
+        ctx.rotate(f.rotation * (1 - p) + floatRoll);
+
+        // Radiant warm halo aura
+        const glowRadius = curR * (1.25 + Math.sin(time * 0.003) * 0.08);
+        const aura = ctx.createRadialGradient(0, 0, curR * 0.3, 0, 0, glowRadius);
+        aura.addColorStop(0, `rgba(255, 248, 252, ${0.92 * p})`);
+        aura.addColorStop(0.45, `rgba(255, 205, 228, ${0.45 * p})`);
+        aura.addColorStop(1, 'rgba(255, 205, 228, 0)');
+        ctx.fillStyle = aura;
+        ctx.beginPath();
+        ctx.arc(0, 0, glowRadius, 0, TAU);
+        ctx.fill();
+
+        // Draw close-up bloom
+        const rose = f.isHero ? heroSprite : (f.bud ? budSprites[f.sprite] : sprites[f.sprite]);
+        const size = rose.logicalSize * curR / rose.radius;
+
+        if (f.bud) {
+          ctx.drawImage(rose.canvas, -size / 2, -size / 2, size, size);
+        } else {
+          ctx.drawImage(rose.openCanvas, -size / 2, -size / 2, size, size);
+        }
+
+        // Sparkling twinkle stars around the flower head
+        if (p > 0.4) {
+          const spAlpha = Math.min(1, (p - 0.4) * 2.2);
+          ctx.save();
+          ctx.globalAlpha = spAlpha * (0.8 + Math.sin(time * 0.006) * 0.2);
+          drawStarSparkle(ctx, -curR * 0.75, -curR * 0.5, 12, time * 0.003);
+          drawStarSparkle(ctx, curR * 0.78, -curR * 0.4, 10, -time * 0.002);
+          drawStarSparkle(ctx, curR * 0.35, curR * 0.8, 11, time * 0.004);
+          drawStarSparkle(ctx, -curR * 0.65, curR * 0.65, 9, -time * 0.003);
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
       function drawBursts() {
         for (let i = activeBursts.length - 1; i >= 0; i--) {
           const b = activeBursts[i];
           b.x += b.vx;
           b.y += b.vy;
-          b.vy += 0.12; // gravity
+          b.vy += 0.12;
           b.rotation += b.vRot;
           b.life -= b.decay;
 
@@ -817,6 +940,28 @@
 
           ctx.beginPath();
           ctx.ellipse(0, 0, b.size, b.size * 0.6, 0, 0, TAU);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      function drawMagicSparkles() {
+        for (let i = magicSparkles.length - 1; i >= 0; i--) {
+          const s = magicSparkles[i];
+          s.x += s.vx;
+          s.y += s.vy;
+          s.alpha -= s.decay;
+
+          if (s.alpha <= 0) {
+            magicSparkles.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.globalAlpha = s.alpha;
+          ctx.fillStyle = s.color;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size * s.alpha, 0, TAU);
           ctx.fill();
           ctx.restore();
         }
@@ -855,7 +1000,7 @@
 
       function finish() {
         state = 'ready'; garden.classList.add('is-ready'); actions.hidden = false;
-        if (hintBannerText) {
+        if (hintBannerText && focusState === 'idle') {
           hintBannerText.textContent = guestName 
             ? `${guestName} ơi, hãy chọn một đóa hoa bạn thích nhất nhé! 🌸` 
             : 'Hãy chọn một đóa hoa bạn thích nhất nhé! 🌸';
@@ -875,13 +1020,86 @@
         const elapsed = state === 'idle' ? 0 : (time - started) / 1000;
         const instant = motion.matches && state !== 'idle';
         
+        // ==========================================
+        // Advance & Zoom State Transition Logic
+        // ==========================================
+        if (focusState === 'advancing' && focusFlower) {
+          const advanceElapsed = time - focusStartTime;
+          const t = clamp(advanceElapsed / FOCUS_ADVANCE_DURATION);
+          focusProgress = easeInOutCubic(t);
+
+          // Emit trail sparkles as flower flies forward
+          if (Math.random() < 0.65) {
+            const isNarrow = width < 650;
+            const targetX = width * 0.5;
+            const targetY = isNarrow ? height * 0.28 : height * 0.35;
+            const targetRadius = Math.min(width * 0.28, height * 0.24, 110);
+            const curX = focusFlower.startX + (targetX - focusFlower.startX) * focusProgress;
+            const curY = focusFlower.startY + (targetY - focusFlower.startY) * focusProgress;
+            const curR = focusFlower.startRadius + (targetRadius - focusFlower.startRadius) * focusProgress;
+
+            magicSparkles.push({
+              x: curX + (Math.random() - 0.5) * curR * 1.4,
+              y: curY + (Math.random() - 0.5) * curR * 1.4,
+              vx: (Math.random() - 0.5) * 1.2,
+              vy: (Math.random() - 0.5) * 1.2 - 0.5,
+              size: 2.5 + Math.random() * 3,
+              alpha: 1,
+              decay: 0.025 + Math.random() * 0.025,
+              color: Math.random() > 0.4 ? '#fff4f8' : '#ffd1dc'
+            });
+          }
+
+          if (t >= 1) {
+            focusState = 'focused';
+            focusProgress = 1;
+            // Reveal personalized card gently
+            if (window.GardenCardManager) {
+              window.GardenCardManager.showFlowerWish(focusFlower, guestName, focusFlower.flowerName);
+            }
+            if (hintBannerText) {
+              hintBannerText.textContent = `Lời chúc dành riêng cho ${guestName || 'bạn'} ♡`;
+            }
+          }
+        } else if (focusState === 'returning' && focusFlower) {
+          const returnElapsed = time - focusStartTime;
+          const t = clamp(returnElapsed / FOCUS_RETURN_DURATION);
+          focusProgress = 1 - easeOutCubic(t);
+
+          if (t >= 1) {
+            focusState = 'idle';
+            focusProgress = 0;
+            focusFlower = null;
+            if (hintBannerText) {
+              hintBannerText.textContent = guestName 
+                ? `${guestName} ơi, hãy chọn một đóa hoa bạn thích nhất nhé! 🌸` 
+                : 'Hãy chọn một đóa hoa bạn thích nhất nhé! 🌸';
+            }
+          }
+        }
+
+        // 1. Draw Garden Flowers
         if (state !== 'idle') {
           flowers.forEach(f => drawFlower(f, state === 'ready' || instant ? 1 : clamp((elapsed - f.delay) / 1.9), sceneTime, smoothing));
         }
         drawFlower(hero, state === 'idle' ? .72 : state === 'ready' || instant ? 1 : .72 + .28 * clamp(elapsed / 1.8), sceneTime, smoothing, true);
         
+        // 2. Cinematic Vignette Backdrop when flower is zooming in
+        if (focusProgress > 0) {
+          ctx.save();
+          ctx.fillStyle = `rgba(32, 14, 24, ${focusProgress * 0.38})`;
+          ctx.fillRect(0, 0, width, height);
+          ctx.restore();
+        }
+
+        // 3. Draw the focused flower floating in front
+        if (focusFlower && focusProgress > 0) {
+          drawFocusedFlower(focusFlower, focusProgress, sceneTime);
+        }
+
         if (state !== 'idle' && !motion.matches) drawPetals(elapsed, sceneTime);
         drawBursts();
+        drawMagicSparkles();
         
         if (state === 'growing' && (instant || elapsed >= 6.8)) finish();
         if (!motion.matches && !document.hidden) frame = requestAnimationFrame(draw);
@@ -893,12 +1111,10 @@
       }
 
       function findFlowerAtPoint(px, py) {
-        // Prioritize hero flower if close
         if (hero.screenX !== undefined) {
           const dHero = Math.hypot(px - hero.screenX, py - hero.screenY);
           if (dHero <= hero.screenRadius * 1.3) return hero;
         }
-        // Then search from front row (depth 4) back to row 0
         for (let i = flowers.length - 1; i >= 0; i--) {
           const f = flowers[i];
           if (f.screenX !== undefined) {
@@ -912,7 +1128,10 @@
       }
 
       function updateHover(event) {
-        if (event.pointerType === 'touch' || motion.matches) return;
+        if (event.pointerType === 'touch' || motion.matches || focusState !== 'idle' || card.open) {
+          tooltip.hidden = true;
+          return;
+        }
         const rect = canvas.getBoundingClientRect();
         pointer.x = event.clientX - rect.left;
         pointer.y = event.clientY - rect.top;
@@ -942,18 +1161,30 @@
       });
 
       function pickFlower(flower, clickX, clickY) {
-        if (!flower) return;
+        if (!flower || focusState === 'advancing' || focusState === 'focused') return;
         lastPickedFlower = flower;
-        spawnBurst(clickX || flower.screenX, clickY || flower.screenY, 16);
         tooltip.hidden = true;
+        canvas.style.cursor = 'default';
+
+        // Set start point for advancing animation
+        focusFlower = flower;
+        focusFlower.startX = flower.screenX || (width * 0.5);
+        focusFlower.startY = flower.screenY || (height * 0.5);
+        focusFlower.startRadius = flower.screenRadius || (30 * scale);
         
-        // Show personalized card
-        if (window.GardenCardManager) {
-          window.GardenCardManager.showFlowerWish(flower, guestName, flower.flowerName);
+        focusState = 'advancing';
+        focusStartTime = performance.now();
+        focusProgress = 0;
+
+        spawnBurst(clickX || focusFlower.startX, clickY || focusFlower.startY, 18);
+
+        if (hintBannerText) {
+          hintBannerText.textContent = `Đóa hoa đang bay tới trao lời chúc cho ${guestName || 'bạn'}... 🌸`;
         }
       }
 
       canvas.addEventListener('click', event => {
+        if (focusState !== 'idle' || card.open) return;
         const rect = canvas.getBoundingClientRect();
         const px = event.clientX - rect.left;
         const py = event.clientY - rect.top;
@@ -985,13 +1216,13 @@
           sessionStorage.setItem('flowerGuestName', guestName);
           gardenDedication.textContent = `Dành tặng ${guestName}, cả một vườn thương.`;
           currentNameLabel.textContent = guestName;
-          if (hintBannerText) {
+          if (hintBannerText && focusState === 'idle') {
             hintBannerText.textContent = `Chào ${guestName}, hãy chọn một đóa hoa bạn thích nhé! 🌸`;
           }
         } else {
           gardenDedication.textContent = `Dành bạn, cả một vườn thương.`;
           currentNameLabel.textContent = `Đổi tên`;
-          if (hintBannerText) {
+          if (hintBannerText && focusState === 'idle') {
             hintBannerText.textContent = `Hãy chọn một đóa hoa bạn thích để nhận lời chúc nhé! 🌸`;
           }
         }
@@ -1018,23 +1249,41 @@
 
       btnChangeNameTop.addEventListener('click', promptNameModal);
       btnCardChangeName.addEventListener('click', () => {
-        card.close();
+        if (window.GardenCardManager) {
+          window.GardenCardManager.closeCard();
+        }
         promptNameModal();
       });
 
       btnPickAnother.addEventListener('click', () => {
-        card.close();
+        if (window.GardenCardManager) {
+          window.GardenCardManager.closeCard();
+        }
       });
 
-      document.getElementById('closeCard').addEventListener('click', () => card.close());
+      document.getElementById('closeCard').addEventListener('click', () => {
+        if (window.GardenCardManager) {
+          window.GardenCardManager.closeCard();
+        }
+      });
+
+      // When card closes, flower returns smoothly back to garden
+      document.addEventListener('flower:return', () => {
+        if (focusState === 'focused' || focusState === 'advancing') {
+          focusState = 'returning';
+          focusStartTime = performance.now();
+        }
+      });
+
       document.getElementById('readCard').addEventListener('click', () => {
         if (lastPickedFlower) {
-          pickFlower(lastPickedFlower);
+          pickFlower(lastPickedFlower, lastPickedFlower.screenX, lastPickedFlower.screenY);
         }
       });
 
       document.getElementById('replay').addEventListener('click', () => {
         state = 'idle'; garden.classList.remove('is-growing', 'is-ready');
+        focusState = 'idle'; focusProgress = 0; focusFlower = null;
         actions.hidden = true;
         render();
         startBloom();

@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const STORAGE_KEY = 'flower.garden.greeting.20-10.v2';
+  const STORAGE_KEY = 'flower.garden.greeting.20-10.v3';
   const card = document.getElementById('wishCard');
   const reading = document.getElementById('cardReading');
   const editor = document.getElementById('cardEditor');
@@ -14,6 +14,12 @@
   const flowerBadge = document.getElementById('cardFlowerBadge');
   const copyButton = document.getElementById('btnCopyWish');
   const toast = document.getElementById('toastNotification');
+  const cardBouquetPreview = document.getElementById('cardBouquetPreview');
+  const cardBouquetItems = document.getElementById('cardBouquetItems');
+  const btnAdmireBouquet = document.getElementById('btnAdmireBouquet');
+  const btnFloatingReopenCard = document.getElementById('btnFloatingReopenCard');
+
+  let isMinimizing = false;
 
   const inputs = {
     recipient: document.getElementById('recipientInput'),
@@ -21,9 +27,6 @@
     message: document.getElementById('messageInput'),
     signature: document.getElementById('signatureInput')
   };
-
-  let currentWishText = '';
-  let currentFlower = null;
 
   function showToast(text, duration = 2500) {
     if (!toast) return;
@@ -41,7 +44,8 @@
     if (title) title.textContent = tit;
     if (signature) signature.textContent = sig;
     if (message) {
-      message.replaceChildren(...msg.split(/\n\s*\n/).map(text => {
+      const parts = (msg || '').split(/\n\s*\n/).filter(t => t.trim());
+      message.replaceChildren(...parts.map(text => {
         const paragraph = document.createElement('p');
         paragraph.className = 'message';
         paragraph.textContent = text;
@@ -53,22 +57,26 @@
   function showReading() {
     if (editor) editor.hidden = true;
     if (reading) reading.hidden = false;
-    card.setAttribute('aria-labelledby', 'cardTitle');
-    card.scrollTop = 0;
+    if (card) {
+      card.setAttribute('aria-labelledby', 'cardTitle');
+      card.scrollTop = 0;
+    }
   }
 
   if (editButton && editor) {
     editButton.addEventListener('click', () => {
-      inputs.recipient.value = recipient.textContent;
-      inputs.title.value = title.textContent;
-      inputs.message.value = [...message.querySelectorAll('p')].map(p => p.textContent).join('\n\n');
-      inputs.signature.value = signature.textContent;
-      reading.hidden = true;
+      if (inputs.recipient && recipient) inputs.recipient.value = recipient.textContent;
+      if (inputs.title && title) inputs.title.value = title.textContent;
+      if (inputs.message && message) {
+        inputs.message.value = [...message.querySelectorAll('p')].map(p => p.textContent).join('\n\n');
+      }
+      if (inputs.signature && signature) inputs.signature.value = signature.textContent;
+      if (reading) reading.hidden = true;
       editor.hidden = false;
       if (status) status.textContent = '';
       card.setAttribute('aria-labelledby', 'editorTitle');
       card.scrollTop = 0;
-      inputs.recipient.focus({ preventScroll: true });
+      if (inputs.recipient) inputs.recipient.focus({ preventScroll: true });
     });
   }
 
@@ -80,19 +88,41 @@
     });
   }
 
-  card.addEventListener('close', () => {
+  function handleCardClose() {
     showReading();
     if (status) status.textContent = '';
-  });
+    if (card) card.classList.remove('is-open');
+    if (!isMinimizing) {
+      document.dispatchEvent(new CustomEvent('flower:return'));
+    }
+    isMinimizing = false;
+  }
+
+  if (card) {
+    card.addEventListener('close', handleCardClose);
+  }
+
+  if (btnAdmireBouquet) {
+    btnAdmireBouquet.addEventListener('click', () => {
+      window.GardenCardManager.minimizeCard();
+      showToast('Đang ngắm bó hoa trên vườn. Nhấn "💌 Xem lời chúc" để mở lại thiệp! 💐', 3500);
+    });
+  }
+
+  if (btnFloatingReopenCard) {
+    btnFloatingReopenCard.addEventListener('click', () => {
+      btnFloatingReopenCard.hidden = true;
+      openModalDirectly();
+    });
+  }
 
   if (copyButton) {
     copyButton.addEventListener('click', async () => {
-      const fullText = `🌸 ${title.textContent}\n\nGửi ${recipient.textContent},\n${[...message.querySelectorAll('p')].map(p => p.textContent).join('\n\n')}\n\n${signature.textContent}`;
+      const fullText = `🌸 ${title ? title.textContent : ''}\n\nGửi ${recipient ? recipient.textContent : ''},\n${message ? [...message.querySelectorAll('p')].map(p => p.textContent).join('\n\n') : ''}\n\n${signature ? signature.textContent : ''}`;
       try {
         await navigator.clipboard.writeText(fullText);
         showToast('Đã sao chép lời chúc vào khay nhớ tạm! 🌸');
       } catch {
-        // Fallback
         const textarea = document.createElement('textarea');
         textarea.value = fullText;
         document.body.appendChild(textarea);
@@ -107,10 +137,10 @@
   if (editor) {
     editor.addEventListener('submit', event => {
       event.preventDefault();
-      const rec = inputs.recipient.value.trim() || 'bạn thương mến';
-      const tit = inputs.title.value.trim() || 'Chúc mừng ngày 20/10!';
-      const msg = inputs.message.value.trim() || '';
-      const sig = inputs.signature.value.trim() || 'Thương mến ♡';
+      const rec = inputs.recipient ? inputs.recipient.value.trim() : 'bạn thương mến';
+      const tit = inputs.title ? inputs.title.value.trim() : 'Chúc mừng ngày 20/10!';
+      const msg = inputs.message ? inputs.message.value.trim() : '';
+      const sig = inputs.signature ? inputs.signature.value.trim() : 'Thương mến ♡';
 
       renderGreeting(rec, tit, msg, sig);
       showReading();
@@ -118,15 +148,27 @@
     });
   }
 
+  function openModalDirectly() {
+    if (!card) return;
+    if (btnFloatingReopenCard) btnFloatingReopenCard.hidden = true;
+    try {
+      if (!card.open) {
+        card.showModal();
+      }
+    } catch {
+      card.setAttribute('open', '');
+    }
+    card.classList.add('is-open');
+    card.scrollTop = 0;
+  }
+
   window.GardenCardManager = {
     showFlowerWish(flower, guestName, flowerName) {
-      currentFlower = flower;
       const cleanName = (guestName || '').trim() || 'bạn';
       
-      // Lấy ngẫu nhiên 1 trong 20 câu chúc và thay "bạn" thành tên người dùng
       const wishMsg = window.FlowerWishes 
         ? window.FlowerWishes.getRandomWish(cleanName) 
-        : `Chúc ${cleanName} ngày 20/10 ngập tràn niềm vui và hạnh phúc!`;
+        : `Nhân ngày Phụ nữ Việt Nam 20/10, chúc ${cleanName} luôn xinh đẹp, tự tin và rạng rỡ!`;
         
       const cardTitleText = `Mong những điều tuyệt vời nhất luôn bên ${cleanName}`;
       const sigText = `Gửi ${cleanName} vạn đóa yêu thương ♡`;
@@ -136,15 +178,89 @@
         flowerBadge.textContent = `🌸 ${flowerName} · ${idLabel}`;
       }
 
+      if (cardBouquetPreview) cardBouquetPreview.hidden = true;
+      if (btnAdmireBouquet) btnAdmireBouquet.hidden = true;
+      if (btnFloatingReopenCard) btnFloatingReopenCard.hidden = true;
+
       renderGreeting(cleanName, cardTitleText, wishMsg, sigText);
       showReading();
-      if (!card.open) {
-        card.showModal();
+      openModalDirectly();
+    },
+
+    showBouquetWish(flowersList, guestName) {
+      const cleanName = (guestName || '').trim() || 'bạn';
+      const list = (flowersList && flowersList.length) ? flowersList : [];
+      const count = list.length || 1;
+      const flowerNames = list.map(f => f.flowerName || 'Đóa Hồng Yêu Thương').join(', ');
+      
+      const wishMsg = window.FlowerWishes 
+        ? window.FlowerWishes.getRandomWish(cleanName) 
+        : `Nhân ngày Phụ nữ Việt Nam 20/10, chúc ${cleanName} luôn xinh đẹp, tự tin và rạng rỡ!`;
+        
+      const cardTitleText = `Bó hoa đặc biệt dành tặng ${cleanName}`;
+      const sigText = `Gửi ${cleanName} vạn đóa yêu thương ♡`;
+
+      if (flowerBadge) {
+        flowerBadge.textContent = `💐 Bó hoa gồm ${count} đóa do chính tay chọn`;
+      }
+
+      // Render bouquet preview chips inside modal
+      if (cardBouquetPreview && cardBouquetItems) {
+        cardBouquetPreview.hidden = false;
+        cardBouquetItems.innerHTML = '';
+        list.forEach((fl, idx) => {
+          const item = document.createElement('span');
+          item.className = 'card-bouquet-item';
+          item.innerHTML = `<span>🌸</span> <strong>#${idx + 1}</strong> ${fl.flowerName || 'Đóa hoa'}`;
+          cardBouquetItems.appendChild(item);
+        });
+      }
+
+      if (btnAdmireBouquet) btnAdmireBouquet.hidden = false;
+      if (btnFloatingReopenCard) btnFloatingReopenCard.hidden = true;
+
+      const fullMessage = `Bó hoa ngát hương gồm ${count} đóa rực rỡ do chính bạn kết lại dành tặng riêng cho ${cleanName}.\n\n${wishMsg}`;
+
+      renderGreeting(cleanName, cardTitleText, fullMessage, sigText);
+      showReading();
+      openModalDirectly();
+    },
+
+    minimizeCard() {
+      isMinimizing = true;
+      if (card && card.open) {
+        card.classList.remove('is-open');
+        try {
+          card.close();
+        } catch {
+          card.removeAttribute('open');
+        }
+      }
+      if (btnFloatingReopenCard) {
+        btnFloatingReopenCard.hidden = false;
       }
     },
-    closeCard() {
-      if (card.open) card.close();
+
+    hideFloatingReopen() {
+      if (btnFloatingReopenCard) {
+        btnFloatingReopenCard.hidden = true;
+      }
     },
+
+    closeCard() {
+      if (btnFloatingReopenCard) btnFloatingReopenCard.hidden = true;
+      if (card && card.open) {
+        card.classList.remove('is-open');
+        setTimeout(() => {
+          try {
+            card.close();
+          } catch {
+            card.removeAttribute('open');
+          }
+        }, 200);
+      }
+    },
+
     showToast
   };
 })();

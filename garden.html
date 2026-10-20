@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#bbdff5">
-  <meta name="description" content="Khu vườn hoa 20/10 với những lời chúc được cá nhân hóa riêng theo họ tên của bạn.">
+  <meta name="description" content="Khu vườn hoa 20/10 với những đóa hoa bay tới nở rộ và những lời chúc cá nhân hóa theo họ tên.">
   <title>Vườn Hoa Yêu Thương · 20/10</title>
   <link rel="preload" href="./assets/fonts/noto-serif-regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./assets/fonts/noto-sans-regular.woff2" as="font" type="font/woff2" crossorigin>
@@ -59,57 +59,60 @@
 
     /* Top Page Header */
     .page-header {
-      position: absolute; top: max(20px, env(safe-area-inset-top));
-      left: clamp(20px, 4vw, 60px); right: clamp(20px, 4vw, 60px);
-      display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;
+      position: absolute; top: max(18px, env(safe-area-inset-top));
+      left: clamp(16px, 4vw, 50px); right: clamp(16px, 4vw, 50px);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
       z-index: 10;
     }
     .header-left {
       display: flex; flex-direction: column; gap: 6px;
     }
     .dedication {
-      margin: 0; font: italic clamp(17px, 2.2vw, 22px)/1.5 var(--font-letter);
-      color: var(--ink); text-shadow: 0 1px 8px rgba(255,255,255,0.8);
+      margin: 0; font: italic clamp(16px, 2.2vw, 22px)/1.4 var(--font-letter);
+      color: var(--ink); text-shadow: 0 1px 8px rgba(255,255,255,0.85);
     }
-    .btn-change-name {
+    .header-controls {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .btn-change-name, .btn-mode-toggle {
       display: inline-flex; align-items: center; gap: 6px;
-      align-self: flex-start; padding: 4px 12px; font-size: 12px;
-      background: rgba(255, 255, 255, 0.85); border: 1px solid #dcb9c8;
+      padding: 5px 13px; font-size: 12px; font-weight: 500;
+      background: rgba(255, 255, 255, 0.9); border: 1px solid #dcb9c8;
       border-radius: 20px; color: var(--rose-dark);
       backdrop-filter: blur(4px); transition: all .25s ease;
       box-shadow: 0 2px 8px rgba(112,58,80,0.08);
     }
-    .btn-change-name:hover {
+    .btn-change-name:hover, .btn-mode-toggle:hover {
       background: #fae7ef; border-color: var(--rose); transform: translateY(-1px);
     }
+    .btn-mode-toggle.active {
+      background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dark) 100%);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 3px 12px rgba(198, 99, 136, 0.35);
+    }
     .date {
-      margin: 0; text-align: right; font-size: 11px; line-height: 1.6; color: var(--muted);
+      margin: 0; text-align: right; font-size: 11px; line-height: 1.5; color: var(--muted);
       text-shadow: 0 1px 6px rgba(255,255,255,0.8);
     }
     .date span {
-      display: block; font: clamp(22px, 3vw, 28px)/1.3 var(--font-letter);
+      display: block; font: clamp(20px, 3vw, 26px)/1.2 var(--font-letter);
       color: var(--ink); margin-bottom: 2px;
     }
 
     /* Central Hint Banner */
     .garden-hint-banner {
-      position: absolute; top: max(82px, calc(env(safe-area-inset-top) + 68px));
+      position: absolute; top: max(78px, calc(env(safe-area-inset-top) + 64px));
       left: 50%; transform: translateX(-50%);
       z-index: 9; pointer-events: none;
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 8px 20px; border-radius: 30px;
-      background: rgba(255, 255, 255, 0.88);
+      padding: 7px 18px; border-radius: 30px;
+      background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(220, 185, 200, 0.7);
-      box-shadow: 0 4px 20px rgba(112, 58, 80, 0.12);
+      box-shadow: 0 4px 18px rgba(112, 58, 80, 0.1);
       backdrop-filter: blur(6px);
-      font-size: clamp(12px, 1.6vw, 14px); color: var(--ink);
+      font-size: clamp(12px, 1.5vw, 13.5px); color: var(--ink);
       white-space: nowrap; max-width: 92vw;
-      transition: opacity .5s ease, transform .5s ease;
-      animation: gentleFloat 3s ease-in-out infinite;
-    }
-    @keyframes gentleFloat {
-      0%, 100% { transform: translate(-50%, 0); }
-      50% { transform: translate(-50%, -4px); }
+      transition: all .35s ease;
     }
 
     #flowers {
@@ -125,21 +128,86 @@
       font-size: 12px; line-height: 1.4; text-align: center;
       box-shadow: 0 4px 16px rgba(0,0,0,0.2);
       transform: translate(-50%, -130%);
-      transition: opacity .2s ease, transform .2s ease;
+      transition: opacity .2s ease;
       backdrop-filter: blur(4px);
     }
     .flower-tooltip span { display: block; }
     .flower-tooltip .tooltip-sub { font-size: 10px; opacity: 0.85; color: #ffdbe6; }
 
-    /* Bottom actions bar */
+    /* Bouquet Dock at Bottom */
+    .bouquet-dock {
+      position: absolute; bottom: max(16px, env(safe-area-inset-bottom));
+      left: 50%; transform: translateX(-50%);
+      z-index: 25; width: min(640px, calc(100% - 24px));
+      padding: 10px 16px; border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(220, 185, 200, 0.85);
+      box-shadow: 0 10px 35px rgba(112, 58, 80, 0.18);
+      backdrop-filter: blur(8px);
+      display: flex; flex-direction: column; gap: 8px;
+      animation: dockSlideUp .4s cubic-bezier(.16, 1, .3, 1) both;
+    }
+    @keyframes dockSlideUp {
+      from { opacity: 0; transform: translate(-50%, 25px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+    .bouquet-dock-header {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .bouquet-dock-title {
+      font-size: 13px; font-weight: 600; color: var(--rose-dark);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .bouquet-count-badge {
+      font-size: 11.5px; padding: 2px 10px; border-radius: 12px;
+      background: #fce8f0; color: var(--rose); font-weight: 500;
+    }
+    .bouquet-chips {
+      display: flex; align-items: center; gap: 6px; overflow-x: auto;
+      padding: 4px 2px; scrollbar-width: none;
+    }
+    .bouquet-chips::-webkit-scrollbar { display: none; }
+    .bouquet-chip {
+      display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+      border-radius: 14px; background: #fff5f8; border: 1px solid #f2c7d8;
+      font-size: 11.5px; color: var(--ink); white-space: nowrap; flex-shrink: 0;
+    }
+    .bouquet-chip button {
+      border: 0; background: transparent; padding: 0 0 0 4px;
+      color: var(--muted); font-size: 14px; line-height: 1;
+    }
+    .bouquet-dock-actions {
+      display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    }
+    .btn-finish-bouquet {
+      border: 0; border-radius: 20px; padding: 8px 18px; font-size: 12.5px; font-weight: 500;
+      background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dark) 100%);
+      color: #fff; box-shadow: 0 3px 12px rgba(198, 99, 136, 0.35);
+      transition: all .2s ease;
+    }
+    .btn-finish-bouquet:disabled {
+      opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none;
+    }
+    .btn-finish-bouquet:not(:disabled):hover {
+      transform: translateY(-1px); box-shadow: 0 5px 18px rgba(198, 99, 136, 0.45);
+    }
+    .btn-clear-bouquet, .btn-exit-bouquet {
+      border: 1px solid #dcb9c8; border-radius: 20px; padding: 7px 14px; font-size: 12px;
+      background: #fff; color: var(--muted); transition: all .2s;
+    }
+    .btn-clear-bouquet:hover, .btn-exit-bouquet:hover {
+      background: #fae7ef; color: var(--ink);
+    }
+
+    /* Bottom standard actions bar */
     .garden-actions {
-      position: absolute; bottom: max(20px, env(safe-area-inset-bottom));
+      position: absolute; bottom: max(18px, env(safe-area-inset-bottom));
       left: 0; right: 0; z-index: 10;
       display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; padding: 0 16px;
     }
     .garden-actions button, .garden-actions a {
       border: 1px solid #dcb9c8; background: #fffdfcf2; border-radius: 30px;
-      padding: 10px 18px; font-size: 12px; color: var(--ink); text-decoration: none;
+      padding: 9px 16px; font-size: 12px; color: var(--ink); text-decoration: none;
       box-shadow: 0 3px 14px #76364d14; transition: all .25s ease;
       display: inline-flex; align-items: center; gap: 6px;
     }
@@ -149,23 +217,29 @@
 
     /* Modal / Dialog Base */
     dialog {
-      width: min(500px, calc(100% - 32px)); max-height: calc(100svh - 36px);
-      padding: 0; border: 0; border-radius: 20px; overflow: auto;
+      width: min(520px, calc(100% - 32px)); max-height: calc(100svh - 40px);
+      padding: 0; border: 0; border-radius: 22px; overflow: auto;
       background: var(--paper); color: var(--ink);
-      box-shadow: 0 24px 80px rgba(112, 58, 80, 0.28), 0 4px 16px rgba(112, 58, 80, 0.1);
+      box-shadow: 0 24px 80px rgba(112, 58, 80, 0.32), 0 4px 20px rgba(112, 58, 80, 0.15);
       scrollbar-width: none; -ms-overflow-style: none;
+      z-index: 9999;
     }
     dialog::-webkit-scrollbar { display: none; }
     dialog::backdrop {
-      background: rgba(187, 223, 245, 0.45);
-      backdrop-filter: blur(8px);
+      background: rgba(30, 15, 25, 0.45);
+      backdrop-filter: blur(6px);
     }
+
+    /* Guaranteed Display When Open */
     dialog[open] {
-      animation: modalUnfold .6s cubic-bezier(.16, 1, .3, 1) both;
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      animation: wishCardReveal .55s cubic-bezier(.16, 1, .3, 1) both;
     }
-    @keyframes modalUnfold {
-      from { opacity: 0; transform: translateY(28px) scale(.95); }
-      to { opacity: 1; transform: none; }
+    @keyframes wishCardReveal {
+      from { opacity: 0; transform: translateY(30px) scale(.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     /* Name Prompt Dialog */
@@ -227,12 +301,12 @@
 
     /* Wish Card Letter */
     .letter {
-      position: relative; padding: 36px 36px 28px; text-align: center;
+      position: relative; padding: 34px 34px 26px; text-align: center;
       background: linear-gradient(180deg, #fffcfd 0%, #fff7f9 100%);
     }
     .letter::before {
       content: ""; position: absolute; inset: 12px;
-      border: 1px solid #eed6e1; border-radius: 12px; pointer-events: none;
+      border: 1px solid #eed6e1; border-radius: 14px; pointer-events: none;
     }
     .close-card {
       position: absolute; top: 16px; right: 18px; width: 34px; height: 34px;
@@ -249,7 +323,7 @@
     }
     .flower-badge {
       display: inline-block; padding: 5px 14px; border-radius: 16px;
-      background: #fce8f0; color: var(--rose-dark); font-size: 12px; font-weight: 500;
+      background: #fce8f0; color: var(--rose-dark); font-size: 12.5px; font-weight: 600;
       margin-bottom: 12px; border: 1px solid #f2c7d8;
     }
     .letter-sprig {
@@ -260,15 +334,15 @@
     }
     .recipient span { font-weight: 600; text-decoration: underline; text-decoration-color: #eed6e1; text-underline-offset: 4px; }
     h2#cardTitle {
-      font: 400 clamp(22px, 4vw, 27px)/1.45 var(--font-letter);
-      margin: 0 0 20px; color: var(--ink); text-wrap: balance;
+      font: 400 clamp(21px, 4vw, 26px)/1.45 var(--font-letter);
+      margin: 0 0 18px; color: var(--ink); text-wrap: balance;
     }
     .message {
-      font-size: 14.5px; line-height: 1.95; margin: 0 0 14px;
-      text-wrap: pretty; color: #582e3f;
+      font-size: 15px; line-height: 1.95; margin: 0 0 14px;
+      text-wrap: pretty; color: #4a2032; font-weight: 400;
     }
     .signature {
-      margin: 22px 0 24px; font: italic 16.5px/1.8 var(--font-letter);
+      margin: 20px 0 22px; font: italic 16.5px/1.8 var(--font-letter);
       color: var(--rose-dark);
     }
     .letter-actions {
@@ -316,8 +390,8 @@
     /* Toast Notification */
     .toast-notification {
       position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
-      z-index: 100; padding: 10px 22px; border-radius: 30px;
-      background: rgba(45, 20, 30, 0.9); color: #fff; font-size: 13px;
+      z-index: 10000; padding: 10px 22px; border-radius: 30px;
+      background: rgba(45, 20, 30, 0.92); color: #fff; font-size: 13px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.25); backdrop-filter: blur(4px);
       opacity: 0; pointer-events: none; transition: all .3s cubic-bezier(.16, 1, .3, 1);
     }
@@ -326,10 +400,10 @@
     }
 
     @media (max-width: 600px) {
-      .letter { padding: 30px 20px 22px; }
-      .garden-hint-banner { top: max(74px, calc(env(safe-area-inset-top) + 58px)); font-size: 12px; padding: 6px 14px; }
+      .letter { padding: 28px 18px 20px; }
+      .garden-hint-banner { top: max(72px, calc(env(safe-area-inset-top) + 56px)); font-size: 11.5px; padding: 6px 14px; }
       .date { font-size: 10px; }
-      .date span { font-size: 22px; }
+      .date span { font-size: 20px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -342,9 +416,14 @@
     <header class="page-header">
       <div class="header-left">
         <p class="dedication" id="gardenDedication">Dành bạn, cả một vườn thương.</p>
-        <button id="btnChangeNameTop" class="btn-change-name" type="button" title="Đổi tên người nhận">
-          <span>✎</span> <span id="currentNameLabel">Đổi tên</span>
-        </button>
+        <div class="header-controls">
+          <button id="btnChangeNameTop" class="btn-change-name" type="button" title="Đổi tên người nhận">
+            <span>✎</span> <span id="currentNameLabel">Đổi tên</span>
+          </button>
+          <button id="btnToggleBouquetMode" class="btn-mode-toggle" type="button" title="Bật chế độ tự bó hoa">
+            <span>💐</span> <span>Tự bó hoa</span>
+          </button>
+        </div>
       </div>
       <p class="date"><span>20 / 10</span>Ngày Phụ nữ Việt Nam</p>
     </header>
@@ -362,13 +441,37 @@
     <!-- Floating Tooltip -->
     <div id="flowerTooltip" class="flower-tooltip" hidden>
       <span id="tooltipFlowerName">Đóa hoa hồng</span>
-      <span class="tooltip-sub">Chạm để nhận lời chúc 🌸</span>
+      <span class="tooltip-sub" id="tooltipSubText">Chạm để đóa hoa tiến tới trao lời chúc 🌸</span>
     </div>
 
     <!-- Toast Notification -->
     <div id="toastNotification" class="toast-notification" hidden></div>
 
-    <!-- Bottom Actions -->
+    <!-- Bouquet Builder Dock (When Bouquet Mode is Active) -->
+    <div id="bouquetDock" class="bouquet-dock" hidden>
+      <div class="bouquet-dock-header">
+        <div class="bouquet-dock-title">
+          <span>💐</span> Bó hoa của <strong id="dockGuestName">bạn</strong>
+        </div>
+        <span class="bouquet-count-badge" id="dockCountBadge">0 đóa hoa</span>
+      </div>
+      <div class="bouquet-chips" id="dockChips">
+        <span style="font-size: 11.5px; color: var(--muted); padding: 4px;">Chạm các đóa hoa trong vườn để thêm vào bó...</span>
+      </div>
+      <div class="bouquet-dock-actions">
+        <button id="btnExitBouquetMode" class="btn-exit-bouquet" type="button">
+          ✕ Hái 1 bông
+        </button>
+        <button id="btnClearBouquet" class="btn-clear-bouquet" type="button">
+          ↻ Xóa bó
+        </button>
+        <button id="btnFinishBouquet" class="btn-finish-bouquet" type="button" disabled>
+          💌 Hoàn thành bó hoa & Xem lời chúc
+        </button>
+      </div>
+    </div>
+
+    <!-- Standard Bottom Actions Bar -->
     <nav class="garden-actions" id="actions" aria-label="Tùy chọn khu vườn">
       <button id="readCard" type="button" aria-haspopup="dialog" aria-controls="wishCard">
         <span>💌</span> Xem lại lời chúc
@@ -400,7 +503,7 @@
           </button>
         </form>
         <p class="name-tip">
-          💡 Mỗi đóa hoa trong vườn đều ẩn chứa một lời chúc độc nhất dành riêng cho bạn.
+          💡 Chạm vào đóa hoa nào, đóa hoa đó sẽ tiến tới và gửi tặng bạn một lời chúc riêng.
         </p>
       </div>
     </dialog>
@@ -481,13 +584,30 @@
       const btnPickAnother = document.getElementById('btnPickAnother');
       const tooltip = document.getElementById('flowerTooltip');
       const tooltipName = document.getElementById('tooltipFlowerName');
+      const tooltipSubText = document.getElementById('tooltipSubText');
       const card = document.getElementById('wishCard');
       const actions = document.getElementById('actions');
       const motion = matchMedia('(prefers-reduced-motion: reduce)');
+
+      // Mode Switcher & Bouquet Dock
+      const btnToggleBouquetMode = document.getElementById('btnToggleBouquetMode');
+      const bouquetDock = document.getElementById('bouquetDock');
+      const dockGuestName = document.getElementById('dockGuestName');
+      const dockCountBadge = document.getElementById('dockCountBadge');
+      const dockChips = document.getElementById('dockChips');
+      const btnFinishBouquet = document.getElementById('btnFinishBouquet');
+      const btnClearBouquet = document.getElementById('btnClearBouquet');
+      const btnExitBouquetMode = document.getElementById('btnExitBouquetMode');
       
+      let appMode = 'single'; // 'single' | 'bouquet'
+      let selectedBouquetFlowers = [];
+
       const TAU = Math.PI * 2;
       const clamp = n => Math.max(0, Math.min(1, n));
       const ease = n => 1 - Math.pow(1 - clamp(n), 3);
+      const easeInOutCubic = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const easeOutCubic = t => 1 - Math.pow(1 - clamp(t), 3);
+
       let seed = 2010;
       const random = () => { seed = seed * 16807 % 2147483647; return (seed - 1) / 2147483646; };
       
@@ -654,7 +774,6 @@
         size: 3 + random() * 4, speed: 9 + random() * 12
       }));
 
-      // Dynamic burst petals on click
       const activeBursts = [];
       function spawnBurst(cx, cy, count = 12) {
         for (let i = 0; i < count; i++) {
@@ -673,9 +792,21 @@
         }
       }
 
+      const magicSparkles = [];
+
+      // ==========================================
+      // Interaction & Advance States
+      // ==========================================
+      let focusFlower = null;
+      let focusBouquetList = [];
+      let focusProgress = 0;       // 0 -> 1
+      let focusState = 'idle';     // 'idle' | 'advancing' | 'focused' | 'returning' | 'advancing_bouquet' | 'focused_bouquet' | 'returning_bouquet'
+      let focusStartTime = 0;
+      const FOCUS_ADVANCE_DURATION = 1300;
+      const FOCUS_RETURN_DURATION = 850;
+
       const pointer = { x: -1000, y: -1000 };
       let hoveredFlower = null;
-      let lastHoveredFlower = null;
       let lastPickedFlower = hero;
       let width = 0, height = 0, scale = 1, frame = 0, lastFrame = 0;
       let sceneTime = 0;
@@ -702,7 +833,7 @@
         
         const dx = x - pointer.x, dy = y - pointer.y;
         const distance = Math.hypot(dx, dy);
-        const proximity = !motion.matches && !card.open ? clamp(1 - distance / (r * 2.3)) : 0;
+        const proximity = (!motion.matches && focusState === 'idle' && !card.open) ? clamp(1 - distance / (r * 2.3)) : 0;
         
         f.offsetX += ((dx / (distance || 1)) * proximity * r * .13 - f.offsetX) * smoothing;
         f.offsetY += ((dy / (distance || 1)) * proximity * r * .08 - f.offsetY) * smoothing;
@@ -716,12 +847,19 @@
         const controlX2 = headX + 8 * scale + sway * .12;
         const controlY2 = headY + (root - headY) * .22;
 
-        // Store live head position for accurate hit detection
         f.screenX = headX;
         f.screenY = headY;
         f.screenRadius = r;
+        f.baseX = baseX;
+        f.rootY = root;
 
-        ctx.save(); ctx.globalAlpha = isHero ? 1 : Math.min(1, f.alpha) * clamp(growth * 3);
+        // Dim if focus flower is active
+        const isDimmed = (focusProgress > 0 && f !== focusFlower && !focusBouquetList.includes(f));
+        const dimFactor = isDimmed ? (1 - focusProgress * 0.45) : 1;
+        
+        ctx.save();
+        ctx.globalAlpha = (isHero ? 1 : Math.min(1, f.alpha) * clamp(growth * 3)) * dimFactor;
+        
         const stemColor = ctx.createLinearGradient(baseX - 2, root, headX + 2, headY);
         stemColor.addColorStop(0, '#46664c'); stemColor.addColorStop(.5, '#789265'); stemColor.addColorStop(1, '#587b53');
         ctx.strokeStyle = stemColor;
@@ -742,10 +880,18 @@
           });
         }
 
+        // Hide normal flower head if it's currently advancing in focus mode
+        const isFocusingSingle = (f === focusFlower && focusProgress > 0.05);
+        const isFocusingBouquet = (focusBouquetList.includes(f) && focusProgress > 0.05);
+        if (isFocusingSingle || isFocusingBouquet) {
+          ctx.restore();
+          return;
+        }
+
         ctx.translate(headX, headY);
         ctx.rotate(f.rotation + wind * .095 + f.offsetX * .003);
         const breath = motion.matches ? 1 : 1 + Math.sin(time * .0014 + f.phase) * .008;
-        const isHovered = (hoveredFlower === f);
+        const isHovered = (hoveredFlower === f && focusState === 'idle');
         const hoverBonus = isHovered ? .12 : 0;
         
         ctx.scale((breath + hoverBonus) * (1 + f.hover * .04), f.tilt * (breath + hoverBonus) * (1 + f.hover * .04));
@@ -774,11 +920,37 @@
           }
         }
 
-        // Radiant halo ring when hovered
+        // Selection badge if selected in Bouquet Mode
+        if (appMode === 'bouquet') {
+          const bIdx = selectedBouquetFlowers.indexOf(f);
+          if (bIdx >= 0) {
+            ctx.beginPath();
+            ctx.arc(0, 0, r * 0.95, 0, TAU);
+            ctx.strokeStyle = '#e69900';
+            ctx.lineWidth = 3 * scale;
+            ctx.shadowColor = 'rgba(255, 200, 50, 0.9)';
+            ctx.shadowBlur = 12;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Number tag
+            ctx.fillStyle = '#b8335a';
+            ctx.beginPath();
+            ctx.arc(r * 0.55, -r * 0.55, 11 * scale, 0, TAU);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = `bold ${Math.round(11 * scale)}px "Noto Sans", sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(String(bIdx + 1), r * 0.55, -r * 0.55);
+          }
+        }
+
+        // Radiant halo ring when hovered in idle state
         if (isHovered && state === 'ready') {
           ctx.beginPath();
           ctx.arc(0, 0, r * 0.9, 0, TAU);
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
           ctx.lineWidth = 2.5 * scale;
           ctx.shadowColor = 'rgba(255, 180, 210, 0.9)';
           ctx.shadowBlur = 14;
@@ -789,12 +961,149 @@
         ctx.restore();
       }
 
+      function drawStarSparkle(c, x, y, size, rot) {
+        c.save();
+        c.translate(x, y);
+        c.rotate(rot);
+        c.fillStyle = '#fffdf5';
+        c.shadowColor = '#ffcde0';
+        c.shadowBlur = 8;
+        c.beginPath();
+        for (let i = 0; i < 4; i++) {
+          c.rotate(Math.PI / 2);
+          c.lineTo(size, 0);
+          c.lineTo(size * 0.22, size * 0.22);
+        }
+        c.fill();
+        c.restore();
+      }
+
+      // ==============================================================
+      // DRAW COMPLETE ADVANCING FLOWER (FLOWER + STEM + LEAVES + BLOOM)
+      // ==============================================================
+      function drawCompleteFocusedFlower(f, progress, time, targetSpreadX = 0, targetSpreadY = 0) {
+        if (!f || progress <= 0) return;
+        const p = clamp(progress);
+
+        const isNarrow = width < 650;
+        const targetHeadX = width * 0.5 + targetSpreadX;
+        const targetHeadY = (isNarrow ? height * 0.28 : height * 0.34) + targetSpreadY;
+        const targetRootX = width * 0.5 + targetSpreadX * 0.3;
+        const targetRootY = height * 1.06;
+        const targetRadius = Math.min(width * 0.26, height * 0.22, 100);
+
+        const curHeadX = f.startX + (targetHeadX - f.startX) * p;
+        const curHeadY = f.startY + (targetHeadY - f.startY) * p;
+        const curRootX = (f.baseX || (f.x * width)) + (targetRootX - (f.baseX || (f.x * width))) * p;
+        const curRootY = (f.rootY || (height * 1.04)) + (targetRootY - (f.rootY || (height * 1.04))) * p;
+        const curR = f.startRadius + (targetRadius - f.startRadius) * p;
+
+        // 1. Draw Botanical Stem (Cành hoa vươn tới)
+        ctx.save();
+        const bend = (f.bend || 0) * scale * (1 - p * 0.5);
+        const sway = Math.sin(time * 0.002 + f.phase) * (14 * (1 - p * 0.4));
+        const c1X = curRootX - bend + sway * 0.25;
+        const c1Y = curRootY - (curRootY - curHeadY) * 0.42;
+        const c2X = curHeadX + 10 * scale + sway * 0.15;
+        const c2Y = curHeadY + (curRootY - curHeadY) * 0.22;
+
+        const stemGrad = ctx.createLinearGradient(curRootX, curRootY, curHeadX, curHeadY);
+        stemGrad.addColorStop(0, '#3d5c42');
+        stemGrad.addColorStop(0.5, '#688c5a');
+        stemGrad.addColorStop(1, '#4e734a');
+        ctx.strokeStyle = stemGrad;
+        ctx.lineWidth = Math.max(3, 3.2 * scale * (1 + p * 0.8));
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(curRootX, curRootY);
+        ctx.bezierCurveTo(c1X, c1Y, c2X, c2Y, curHeadX, curHeadY);
+        ctx.stroke();
+
+        // 2. Draw Leaves on advancing stem (Lá hoa vươn tới)
+        [0.38, 0.64].forEach((tLeaf, idx) => {
+          const u = 1 - tLeaf;
+          const lx = u**3 * curRootX + 3*u*u*tLeaf*c1X + 3*u*tLeaf*tLeaf*c2X + tLeaf**3 * curHeadX;
+          const ly = u**3 * curRootY + 3*u*u*tLeaf*c1Y + 3*u*tLeaf*tLeaf*c2Y + tLeaf**3 * curHeadY;
+          const leafLen = curR * (0.85 + p * 0.35);
+          const flutter = Math.sin(time * 0.003 + idx) * 0.08;
+          leaf(lx, ly, idx ? -1 : 1, leafLen, flutter);
+        });
+        ctx.restore();
+
+        // 3. Draw Radiant Aura behind Flower Head
+        ctx.save();
+        ctx.translate(curHeadX, curHeadY);
+
+        const floatRoll = Math.sin(time * 0.002 + f.phase) * 0.05;
+        ctx.rotate((f.rotation || 0) * (1 - p) + floatRoll);
+
+        const glowRadius = curR * (1.25 + Math.sin(time * 0.003) * 0.08);
+        const aura = ctx.createRadialGradient(0, 0, curR * 0.3, 0, 0, glowRadius);
+        aura.addColorStop(0, `rgba(255, 248, 252, ${0.92 * p})`);
+        aura.addColorStop(0.45, `rgba(255, 205, 228, ${0.45 * p})`);
+        aura.addColorStop(1, 'rgba(255, 205, 228, 0)');
+        ctx.fillStyle = aura;
+        ctx.beginPath();
+        ctx.arc(0, 0, glowRadius, 0, TAU);
+        ctx.fill();
+
+        // 4. Draw Flower Head (Nụ hoa BUNG NỞ khi tiến tới)
+        const openSprite = f.isHero 
+          ? heroSprite 
+          : (sprites.find(s => s.paletteKey === f.paletteKey && s.variety === 'garden') || sprites[f.sprite % sprites.length]);
+
+        if (f.bud) {
+          // Nụ hoa tiến tới và BUNG NỞ THÀNH HOA LỚN
+          if (p < 0.22) {
+            const bud = budSprites[f.sprite];
+            const size = bud.logicalSize * curR / bud.radius;
+            ctx.drawImage(bud.canvas, -size / 2, -size / 2, size, size);
+          } else {
+            const bloomProgress = (p - 0.22) / 0.78; // 0 -> 1
+            const size = openSprite.logicalSize * curR / openSprite.radius;
+
+            ctx.save();
+            ctx.scale(0.5 + bloomProgress * 0.5, 0.5 + bloomProgress * 0.5);
+            ctx.drawImage(openSprite.baseCanvas, -size / 2, -size / 2, size, size);
+            ctx.restore();
+
+            openSprite.whorlCanvases.forEach((layer, idx) => {
+              const openVal = ease((bloomProgress - whorlDelays[idx]) / (1 - whorlDelays[idx]));
+              const unfurl = closedScales[idx] + (1 - closedScales[idx]) * openVal;
+              ctx.save();
+              ctx.rotate((1 - openVal) * twistAngles[idx]);
+              ctx.scale(unfurl, unfurl * (0.78 + openVal * 0.22));
+              ctx.drawImage(layer, -size / 2, -size / 2, size, size);
+              ctx.restore();
+            });
+          }
+        } else {
+          // Hoa đã nở thì nở rực rỡ nhất
+          const rose = f.isHero ? heroSprite : (sprites[f.sprite] || openSprite);
+          const size = rose.logicalSize * curR / rose.radius;
+          ctx.drawImage(rose.openCanvas, -size / 2, -size / 2, size, size);
+        }
+
+        // 5. Star sparkles around head
+        if (p > 0.4) {
+          const spAlpha = Math.min(1, (p - 0.4) * 2.2);
+          ctx.save();
+          ctx.globalAlpha = spAlpha * (0.8 + Math.sin(time * 0.006) * 0.2);
+          drawStarSparkle(ctx, -curR * 0.75, -curR * 0.5, 11, time * 0.003);
+          drawStarSparkle(ctx, curR * 0.78, -curR * 0.4, 9, -time * 0.002);
+          drawStarSparkle(ctx, curR * 0.35, curR * 0.8, 10, time * 0.004);
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
       function drawBursts() {
         for (let i = activeBursts.length - 1; i >= 0; i--) {
           const b = activeBursts[i];
           b.x += b.vx;
           b.y += b.vy;
-          b.vy += 0.12; // gravity
+          b.vy += 0.12;
           b.rotation += b.vRot;
           b.life -= b.decay;
 
@@ -817,6 +1126,28 @@
 
           ctx.beginPath();
           ctx.ellipse(0, 0, b.size, b.size * 0.6, 0, 0, TAU);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      function drawMagicSparkles() {
+        for (let i = magicSparkles.length - 1; i >= 0; i--) {
+          const s = magicSparkles[i];
+          s.x += s.vx;
+          s.y += s.vy;
+          s.alpha -= s.decay;
+
+          if (s.alpha <= 0) {
+            magicSparkles.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.globalAlpha = s.alpha;
+          ctx.fillStyle = s.color;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.size * s.alpha, 0, TAU);
           ctx.fill();
           ctx.restore();
         }
@@ -855,7 +1186,7 @@
 
       function finish() {
         state = 'ready'; garden.classList.add('is-ready'); actions.hidden = false;
-        if (hintBannerText) {
+        if (hintBannerText && focusState === 'idle') {
           hintBannerText.textContent = guestName 
             ? `${guestName} ơi, hãy chọn một đóa hoa bạn thích nhất nhé! 🌸` 
             : 'Hãy chọn một đóa hoa bạn thích nhất nhé! 🌸';
@@ -875,13 +1206,91 @@
         const elapsed = state === 'idle' ? 0 : (time - started) / 1000;
         const instant = motion.matches && state !== 'idle';
         
+        // Single flower advance animation
+        if (focusState === 'advancing' && focusFlower) {
+          const advElapsed = time - focusStartTime;
+          const t = clamp(advElapsed / FOCUS_ADVANCE_DURATION);
+          focusProgress = easeInOutCubic(t);
+
+          if (t >= 1) {
+            focusState = 'focused';
+            focusProgress = 1;
+            if (window.GardenCardManager) {
+              window.GardenCardManager.showFlowerWish(focusFlower, guestName, focusFlower.flowerName);
+            }
+          }
+        } else if (focusState === 'returning' && focusFlower) {
+          const retElapsed = time - focusStartTime;
+          const t = clamp(retElapsed / FOCUS_RETURN_DURATION);
+          focusProgress = 1 - easeOutCubic(t);
+
+          if (t >= 1) {
+            focusState = 'idle';
+            focusProgress = 0;
+            focusFlower = null;
+          }
+        }
+        // Bouquet flowers advance animation
+        else if (focusState === 'advancing_bouquet' && focusBouquetList.length > 0) {
+          const advElapsed = time - focusStartTime;
+          const t = clamp(advElapsed / FOCUS_ADVANCE_DURATION);
+          focusProgress = easeInOutCubic(t);
+
+          if (t >= 1) {
+            focusState = 'focused_bouquet';
+            focusProgress = 1;
+            if (window.GardenCardManager) {
+              window.GardenCardManager.showBouquetWish(focusBouquetList, guestName);
+            }
+          }
+        } else if (focusState === 'returning_bouquet') {
+          const retElapsed = time - focusStartTime;
+          const t = clamp(retElapsed / FOCUS_RETURN_DURATION);
+          focusProgress = 1 - easeOutCubic(t);
+
+          if (t >= 1) {
+            focusState = 'idle';
+            focusProgress = 0;
+            focusBouquetList = [];
+            if (appMode === 'bouquet') {
+              bouquetDock.hidden = false;
+            }
+          }
+        }
+
+        // 1. Draw garden flowers
         if (state !== 'idle') {
           flowers.forEach(f => drawFlower(f, state === 'ready' || instant ? 1 : clamp((elapsed - f.delay) / 1.9), sceneTime, smoothing));
         }
         drawFlower(hero, state === 'idle' ? .72 : state === 'ready' || instant ? 1 : .72 + .28 * clamp(elapsed / 1.8), sceneTime, smoothing, true);
         
+        // 2. Cinematic backdrop vignette
+        if (focusProgress > 0) {
+          ctx.save();
+          ctx.fillStyle = `rgba(32, 14, 24, ${focusProgress * 0.38})`;
+          ctx.fillRect(0, 0, width, height);
+          ctx.restore();
+        }
+
+        // 3. Draw single advancing flower (đầy đủ hoa, cành, lá)
+        if (focusFlower && focusProgress > 0) {
+          drawCompleteFocusedFlower(focusFlower, focusProgress, sceneTime);
+        }
+
+        // 4. Draw bouquet advancing flowers (cả bó hoa tụ lại)
+        if (focusBouquetList.length > 0 && focusProgress > 0) {
+          const total = focusBouquetList.length;
+          focusBouquetList.forEach((fl, idx) => {
+            const spreadAngle = (idx - (total - 1) / 2) * 0.32;
+            const sprX = Math.sin(spreadAngle) * (45 + total * 4);
+            const sprY = Math.cos(spreadAngle) * 12 - 12;
+            drawCompleteFocusedFlower(fl, focusProgress, sceneTime + idx * 200, sprX, sprY);
+          });
+        }
+
         if (state !== 'idle' && !motion.matches) drawPetals(elapsed, sceneTime);
         drawBursts();
+        drawMagicSparkles();
         
         if (state === 'growing' && (instant || elapsed >= 6.8)) finish();
         if (!motion.matches && !document.hidden) frame = requestAnimationFrame(draw);
@@ -893,12 +1302,10 @@
       }
 
       function findFlowerAtPoint(px, py) {
-        // Prioritize hero flower if close
         if (hero.screenX !== undefined) {
           const dHero = Math.hypot(px - hero.screenX, py - hero.screenY);
           if (dHero <= hero.screenRadius * 1.3) return hero;
         }
-        // Then search from front row (depth 4) back to row 0
         for (let i = flowers.length - 1; i >= 0; i--) {
           const f = flowers[i];
           if (f.screenX !== undefined) {
@@ -912,7 +1319,10 @@
       }
 
       function updateHover(event) {
-        if (event.pointerType === 'touch' || motion.matches) return;
+        if (event.pointerType === 'touch' || motion.matches || focusState !== 'idle' || card.open) {
+          tooltip.hidden = true;
+          return;
+        }
         const rect = canvas.getBoundingClientRect();
         pointer.x = event.clientX - rect.left;
         pointer.y = event.clientY - rect.top;
@@ -924,6 +1334,12 @@
             canvas.style.cursor = 'pointer';
             tooltip.hidden = false;
             tooltipName.textContent = match.flowerName;
+            if (appMode === 'bouquet') {
+              const inBouquet = selectedBouquetFlowers.includes(match);
+              tooltipSubText.textContent = inBouquet ? 'Nhấp để bỏ ra khỏi bó hoa' : 'Nhấp để thêm vào bó hoa 💐';
+            } else {
+              tooltipSubText.textContent = 'Chạm để đóa hoa tiến tới trao lời chúc 🌸';
+            }
             tooltip.style.left = `${event.clientX}px`;
             tooltip.style.top = `${event.clientY - 20}px`;
           } else {
@@ -941,26 +1357,131 @@
         tooltip.hidden = true;
       });
 
-      function pickFlower(flower, clickX, clickY) {
-        if (!flower) return;
+      function updateBouquetDock() {
+        const count = selectedBouquetFlowers.length;
+        dockCountBadge.textContent = `${count} đóa hoa`;
+        btnFinishBouquet.disabled = (count === 0);
+
+        dockChips.innerHTML = '';
+        if (count === 0) {
+          dockChips.innerHTML = '<span style="font-size: 11.5px; color: var(--muted); padding: 4px;">Chạm các đóa hoa trong vườn để thêm vào bó...</span>';
+        } else {
+          selectedBouquetFlowers.forEach((f, idx) => {
+            const chip = document.createElement('span');
+            chip.className = 'bouquet-chip';
+            chip.innerHTML = `<span>🌸 #${idx+1} ${f.flowerName}</span><button type="button" title="Bỏ đóa này">×</button>`;
+            chip.querySelector('button').addEventListener('click', (e) => {
+              e.stopPropagation();
+              selectedBouquetFlowers.splice(idx, 1);
+              updateBouquetDock();
+            });
+            dockChips.appendChild(chip);
+          });
+        }
+      }
+
+      function pickFlowerSingle(flower, clickX, clickY) {
+        if (!flower || focusState !== 'idle') return;
         lastPickedFlower = flower;
-        spawnBurst(clickX || flower.screenX, clickY || flower.screenY, 16);
         tooltip.hidden = true;
+        canvas.style.cursor = 'default';
+
+        focusFlower = flower;
+        focusFlower.startX = flower.screenX || (width * 0.5);
+        focusFlower.startY = flower.screenY || (height * 0.5);
+        focusFlower.startRadius = flower.screenRadius || (30 * scale);
         
-        // Show personalized card
-        if (window.GardenCardManager) {
-          window.GardenCardManager.showFlowerWish(flower, guestName, flower.flowerName);
+        focusState = 'advancing';
+        focusStartTime = performance.now();
+        focusProgress = 0;
+
+        spawnBurst(clickX || focusFlower.startX, clickY || focusFlower.startY, 16);
+
+        if (hintBannerText) {
+          hintBannerText.textContent = `Đóa hoa đang bay tới nở rộ và trao lời chúc cho ${guestName || 'bạn'}... 🌸`;
         }
       }
 
       canvas.addEventListener('click', event => {
+        if (focusState !== 'idle' || card.open) return;
         const rect = canvas.getBoundingClientRect();
         const px = event.clientX - rect.left;
         const py = event.clientY - rect.top;
         const target = findFlowerAtPoint(px, py);
+
         if (target) {
-          pickFlower(target, px, py);
+          if (appMode === 'bouquet') {
+            const bIdx = selectedBouquetFlowers.indexOf(target);
+            if (bIdx >= 0) {
+              selectedBouquetFlowers.splice(bIdx, 1);
+            } else {
+              if (selectedBouquetFlowers.length >= 10) {
+                if (window.GardenCardManager) window.GardenCardManager.showToast('Bó hoa đã đủ 10 đóa rực rỡ! 💐');
+                return;
+              }
+              target.startX = target.screenX;
+              target.startY = target.screenY;
+              target.startRadius = target.screenRadius;
+              selectedBouquetFlowers.push(target);
+              spawnBurst(px, py, 12);
+            }
+            updateBouquetDock();
+          } else {
+            pickFlowerSingle(target, px, py);
+          }
         }
+      });
+
+      // Finish bouquet builder
+      btnFinishBouquet.addEventListener('click', () => {
+        if (selectedBouquetFlowers.length === 0 || focusState !== 'idle') return;
+        focusBouquetList = [...selectedBouquetFlowers];
+        focusBouquetList.forEach(f => {
+          f.startX = f.screenX || (width * 0.5);
+          f.startY = f.screenY || (height * 0.5);
+          f.startRadius = f.screenRadius || (30 * scale);
+        });
+        focusState = 'advancing_bouquet';
+        focusStartTime = performance.now();
+        focusProgress = 0;
+        bouquetDock.hidden = true;
+        if (hintBannerText) {
+          hintBannerText.textContent = `Bó hoa đặc biệt đang tụ lại để dành tặng ${guestName || 'bạn'}... 💐`;
+        }
+      });
+
+      btnClearBouquet.addEventListener('click', () => {
+        selectedBouquetFlowers = [];
+        updateBouquetDock();
+      });
+
+      function setAppMode(newMode) {
+        appMode = newMode;
+        if (appMode === 'bouquet') {
+          btnToggleBouquetMode.classList.add('active');
+          btnToggleBouquetMode.innerHTML = '<span>🌸</span> <span>Hái 1 đóa</span>';
+          bouquetDock.hidden = false;
+          if (hintBannerText) {
+            hintBannerText.textContent = `Chạm các đóa hoa để kết thành bó cho ${guestName || 'bạn'} nhé! 💐`;
+          }
+          dockGuestName.textContent = guestName || 'bạn';
+          updateBouquetDock();
+        } else {
+          btnToggleBouquetMode.classList.remove('active');
+          btnToggleBouquetMode.innerHTML = '<span>💐</span> <span>Tự bó hoa</span>';
+          bouquetDock.hidden = true;
+          if (hintBannerText) {
+            hintBannerText.textContent = `Hãy chạm vào một đóa hoa bạn thích để nhận lời chúc nhé! 🌸`;
+          }
+        }
+      }
+
+      btnToggleBouquetMode.addEventListener('click', () => {
+        setAppMode(appMode === 'single' ? 'bouquet' : 'single');
+      });
+
+      btnExitBouquetMode.addEventListener('click', () => {
+        setAppMode('single');
       });
 
       function resize() {
@@ -985,13 +1506,17 @@
           sessionStorage.setItem('flowerGuestName', guestName);
           gardenDedication.textContent = `Dành tặng ${guestName}, cả một vườn thương.`;
           currentNameLabel.textContent = guestName;
-          if (hintBannerText) {
-            hintBannerText.textContent = `Chào ${guestName}, hãy chọn một đóa hoa bạn thích nhé! 🌸`;
+          dockGuestName.textContent = guestName;
+          if (hintBannerText && focusState === 'idle') {
+            hintBannerText.textContent = (appMode === 'bouquet')
+              ? `Chạm các đóa hoa để kết thành bó cho ${guestName} nhé! 💐`
+              : `Chào ${guestName}, hãy chọn một đóa hoa bạn thích nhé! 🌸`;
           }
         } else {
           gardenDedication.textContent = `Dành bạn, cả một vườn thương.`;
           currentNameLabel.textContent = `Đổi tên`;
-          if (hintBannerText) {
+          dockGuestName.textContent = 'bạn';
+          if (hintBannerText && focusState === 'idle') {
             hintBannerText.textContent = `Hãy chọn một đóa hoa bạn thích để nhận lời chúc nhé! 🌸`;
           }
         }
@@ -1018,23 +1543,44 @@
 
       btnChangeNameTop.addEventListener('click', promptNameModal);
       btnCardChangeName.addEventListener('click', () => {
-        card.close();
+        if (window.GardenCardManager) {
+          window.GardenCardManager.closeCard();
+        }
         promptNameModal();
       });
 
       btnPickAnother.addEventListener('click', () => {
-        card.close();
+        if (window.GardenCardManager) {
+          window.GardenCardManager.closeCard();
+        }
       });
 
-      document.getElementById('closeCard').addEventListener('click', () => card.close());
+      document.getElementById('closeCard').addEventListener('click', () => {
+        if (window.GardenCardManager) {
+          window.GardenCardManager.closeCard();
+        }
+      });
+
+      // When card closes, flower returns smoothly back to garden
+      document.addEventListener('flower:return', () => {
+        if (focusState === 'focused' || focusState === 'advancing') {
+          focusState = 'returning';
+          focusStartTime = performance.now();
+        } else if (focusState === 'focused_bouquet' || focusState === 'advancing_bouquet') {
+          focusState = 'returning_bouquet';
+          focusStartTime = performance.now();
+        }
+      });
+
       document.getElementById('readCard').addEventListener('click', () => {
         if (lastPickedFlower) {
-          pickFlower(lastPickedFlower);
+          pickFlowerSingle(lastPickedFlower, lastPickedFlower.screenX, lastPickedFlower.screenY);
         }
       });
 
       document.getElementById('replay').addEventListener('click', () => {
         state = 'idle'; garden.classList.remove('is-growing', 'is-ready');
+        focusState = 'idle'; focusProgress = 0; focusFlower = null; focusBouquetList = [];
         actions.hidden = true;
         render();
         startBloom();
@@ -1049,7 +1595,6 @@
       new ResizeObserver(resize).observe(garden);
       resize();
 
-      // Launch prompt when page opens
       window.addEventListener('load', () => {
         promptNameModal();
       });
